@@ -14,3 +14,4 @@ debug
 *.cmake
 CMakeCache.txt
 *.pc
+/src/main.cpp.bak
