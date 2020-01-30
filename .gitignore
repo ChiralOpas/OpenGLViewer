@@ -1,0 +1,16 @@
+﻿.vs
+CMakeFiles
+*.tlog
+debug
+*.dll
+*.ilk
+*.pdb
+*.exe
+*.vcxproj.user
+*.vcxproj
+*.vcxproj.filters
+*.props
+*.sln
+*.cmake
+CMakeCache.txt
+*.pc
