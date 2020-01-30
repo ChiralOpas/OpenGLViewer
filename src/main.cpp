@@ -65,6 +65,10 @@ int main(void)
 	if (!glfwInit())
 		exit(EXIT_FAILURE);
 
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+
 	window = glfwCreateWindow(640, 480, "OpenGL Viewer", NULL, NULL);
 	if (!window)
 	{
@@ -95,6 +99,10 @@ int main(void)
 		0, 1, 2,
 		2, 3, 0
 	};
+
+	unsigned int vao;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
 
 	unsigned int buffer;
 	glGenBuffers(1, &buffer);
@@ -133,9 +141,19 @@ int main(void)
 	unsigned int shader = CreateShader(vertexShader, fragmentShader);
 	glUseProgram(shader);
 
+	// Unbind everything
+	glUseProgram(0);
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
 	while (!glfwWindowShouldClose(window))
 	{
 		glClear(GL_COLOR_BUFFER_BIT);
+
+		// Bind everything
+		glUseProgram(shader);
+		glBindVertexArray(vao);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
