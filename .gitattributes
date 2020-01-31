@@ -34,5 +34,8 @@
 *.exe   binary
 *.out   binary
 *.app   binary
+
+# removing vendor folders so linguist will not detect it
 GLEW/* linguist-vendored
 GLFW/* linguist-vendored
+GLM/* linguist-vendored
