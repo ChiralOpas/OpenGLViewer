@@ -1,6 +1,8 @@
 #include <glew.h>
 #include <glfw3.h>
 #include <iostream>
+#include <glm.hpp>
+#include <gtc/matrix_transform.hpp>
 
 static unsigned int CompileShader(const std::string& source, unsigned int type)
 {
@@ -43,6 +45,12 @@ static unsigned int CreateShader(const std::string& vertexShader, const std::str
 	glDeleteShader(fs);
 
 	return program;
+}
+
+void SetUniformMat4f(unsigned int program, const std::string& name, const glm::mat4& matrix)
+{
+	int uniform = glGetUniformLocation(program, name.c_str());
+	glUniformMatrix4fv(uniform, 1, GL_FALSE, &matrix[0][0]);
 }
 
 static void error_callback(int error, const char* description)
@@ -117,15 +125,18 @@ int main(void)
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(float), indicies, GL_STATIC_DRAW);
 
+	// 4x3 aspect ration
+	glm::mat4 projection = glm::ortho(-4.0f, 4.0f, -3.0f, 3.0f, -1.0f, 1.0f);
 
 	std::string vertexShader =
 		"#version 330 core\n"
 		"\n"
 		"layout(location = 0) in vec4 position;\n"
+		"uniform mat4 u_mvp;\n"
 		"\n"
 		"void main()\n"
 		"{\n"
-		"	gl_Position = position;\n"
+		"	gl_Position = u_mvp * position;\n"
 		"}\n";
 
 	std::string fragmentShader =
@@ -154,6 +165,8 @@ int main(void)
 		// Bind everything
 		glUseProgram(shader);
 		glBindVertexArray(vao);
+
+		SetUniformMat4f(shader, "u_mvp", projection);
 
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
 
