@@ -4,6 +4,12 @@
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 
+/// <summary>
+/// Compiling shader with source code given
+/// </summary>
+/// <param name="source">source of shader program</param>
+/// <param name="type">type fo shader we want to compile</param>
+/// <returns>name in unsigned int of compiled program</returns>
 static unsigned int CompileShader(const std::string& source, unsigned int type)
 {
 	unsigned int id = glCreateShader(type);
@@ -30,6 +36,12 @@ static unsigned int CompileShader(const std::string& source, unsigned int type)
 	return id;
 }
 
+/// <summary>
+/// Linking and validating the compiled shader program and return the name of it
+/// </summary>
+/// <param name="vertexShader">source of vertex shader</param>
+/// <param name="fragmentShader">source of fragment shader</param>
+/// <returns>name in unsigned int of created program</returns>
 static unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader)
 {
 	unsigned int program = glCreateProgram();
@@ -45,12 +57,6 @@ static unsigned int CreateShader(const std::string& vertexShader, const std::str
 	glDeleteShader(fs);
 
 	return program;
-}
-
-void SetUniformMat4f(unsigned int program, const std::string& name, const glm::mat4& matrix)
-{
-	int uniform = glGetUniformLocation(program, name.c_str());
-	glUniformMatrix4fv(uniform, 1, GL_FALSE, &matrix[0][0]);
 }
 
 static void error_callback(int error, const char* description)
@@ -152,6 +158,9 @@ int main(void)
 	unsigned int shader = CreateShader(vertexShader, fragmentShader);
 	glUseProgram(shader);
 
+	int uniform = glGetUniformLocation(shader, "u_mvp");
+	glUniformMatrix4fv(uniform, 1, GL_FALSE, &projection[0][0]);
+
 	// Unbind everything
 	glUseProgram(0);
 	glBindVertexArray(0);
@@ -162,13 +171,15 @@ int main(void)
 	{
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		// Bind everything
+		// Bind everything //
 		glUseProgram(shader);
+		// Put uniforms here, specially if they are varying every frame
 		glBindVertexArray(vao);
+		//
 
-		SetUniformMat4f(shader, "u_mvp", projection);
-
+		// Sending signal to execute OpenGL pipeline with all binded objects //
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
+		//
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
