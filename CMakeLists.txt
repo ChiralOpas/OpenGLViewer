@@ -6,6 +6,10 @@ project (${PROJECT_NAME})
 # adding sources to include in project
 file(GLOB SOURCES "src/*.cpp" "src/*.h")
 
+# adding resources to project
+file(GLOB RESOURCES "res/*.glsl")
+source_group("resource" FILES ${RESOURCES})
+
 # adding required include directories
 include_directories(GLEW/include/GL)
 include_directories(GLFW/include/GLFW)
@@ -34,7 +38,7 @@ set_target_properties(glm_static PROPERTIES FOLDER GLM)
 # adding library to link
 set(LIBRARIES_TO_LINK OpenGL32.lib)
 
-add_executable(${PROJECT_NAME} ${SOURCES})
+add_executable(${PROJECT_NAME} ${SOURCES} ${RESOURCES})
 
 # adding reference to dependent projects
 target_link_libraries(${PROJECT_NAME} ${LIBRARIES_TO_LINK} glfw)
