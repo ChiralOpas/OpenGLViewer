@@ -1,3 +1,3 @@
 How to Build
 
-one can use cmake to build the project
+One can use cmake to build the project, Please view the wiki for more details.
