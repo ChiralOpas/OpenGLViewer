@@ -1,63 +1,10 @@
 #include <glew.h>
 #include <glfw3.h>
 #include <iostream>
+#include "shader.h"
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 
-/// <summary>
-/// Compiling shader with source code given
-/// </summary>
-/// <param name="source">source of shader program</param>
-/// <param name="type">type fo shader we want to compile</param>
-/// <returns>name in unsigned int of compiled program</returns>
-static unsigned int CompileShader(const std::string& source, unsigned int type)
-{
-	unsigned int id = glCreateShader(type);
-	const char* src = source.c_str();
-	glShaderSource(id, 1, &src, nullptr);
-	glCompileShader(id);
-
-	int result;
-	glGetShaderiv(id, GL_COMPILE_STATUS, &result);
-	if (result == GL_FALSE)
-	{
-		int length;
-		glGetShaderiv(id, GL_INFO_LOG_LENGTH, &length);
-		char* message = (char*)alloca(length * sizeof(char));
-		glGetShaderInfoLog(id, length, &length, message);
-		std::cout << "Failed to compile " <<
-			(type == GL_VERTEX_SHADER ? "vertex" : "fragment")
-			<< " shader!" << std::endl;
-		std::cout << message << std::endl;
-		glDeleteShader(id);
-		return 0;
-	}
-
-	return id;
-}
-
-/// <summary>
-/// Linking and validating the compiled shader program and return the name of it
-/// </summary>
-/// <param name="vertexShader">source of vertex shader</param>
-/// <param name="fragmentShader">source of fragment shader</param>
-/// <returns>name in unsigned int of created program</returns>
-static unsigned int CreateShader(const std::string& vertexShader, const std::string& fragmentShader)
-{
-	unsigned int program = glCreateProgram();
-	unsigned int vs = CompileShader(vertexShader, GL_VERTEX_SHADER);
-	unsigned int fs = CompileShader(fragmentShader, GL_FRAGMENT_SHADER);
-
-	glAttachShader(program, vs);
-	glAttachShader(program, fs);
-	glLinkProgram(program);
-	glValidateProgram(program);
-
-	glDeleteShader(vs);
-	glDeleteShader(fs);
-
-	return program;
-}
 
 static void error_callback(int error, const char* description)
 {
@@ -134,31 +81,12 @@ int main(void)
 	// 4x3 aspect ration
 	glm::mat4 projection = glm::ortho(-4.0f, 4.0f, -3.0f, 3.0f, -1.0f, 1.0f);
 
-	std::string vertexShader =
-		"#version 330 core\n"
-		"\n"
-		"layout(location = 0) in vec4 position;\n"
-		"uniform mat4 u_mvp;\n"
-		"\n"
-		"void main()\n"
-		"{\n"
-		"	gl_Position = u_mvp * position;\n"
-		"}\n";
 
-	std::string fragmentShader =
-		"#version 330 core\n"
-		"\n"
-		"layout(location = 0) out vec4 color;\n"
-		"\n"
-		"void main()\n"
-		"{\n"
-		"	color = vec4(1.0, 0.0, 0.0, 1.0);\n"
-		"}\n";
 
-	unsigned int shader = CreateShader(vertexShader, fragmentShader);
-	glUseProgram(shader);
+	Shader ordinaryShader("../res/vertex.glsl", "../res/fragment.glsl");
+	int uniform = glGetUniformLocation(ordinaryShader.m_ShaderID, "u_mvp");
 
-	int uniform = glGetUniformLocation(shader, "u_mvp");
+	ordinaryShader.use();
 	glUniformMatrix4fv(uniform, 1, GL_FALSE, &projection[0][0]);
 
 	// Unbind everything
@@ -172,7 +100,7 @@ int main(void)
 		glClear(GL_COLOR_BUFFER_BIT);
 
 		// Bind everything //
-		glUseProgram(shader);
+		ordinaryShader.use();
 		// Put uniforms here, specially if they are varying every frame
 		glBindVertexArray(vao);
 		//
@@ -186,7 +114,6 @@ int main(void)
 	}
 
 	glfwDestroyWindow(window);
-	glDeleteProgram(shader);
 	glfwTerminate();
 	exit(EXIT_SUCCESS);
 }
