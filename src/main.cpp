@@ -1,4 +1,4 @@
-#include <glew.h>
+﻿#include <glew.h>
 #include <glfw3.h>
 #include <iostream>
 #include "shader.h"
@@ -86,8 +86,15 @@ int main(void)
 	Shader ordinaryShader("../res/vertex.glsl", "../res/fragment.glsl");
 	int uniform = glGetUniformLocation(ordinaryShader.m_ShaderID, "u_mvp");
 
+	// getting location of subroutines
+	GLuint rbSelection = glGetSubroutineUniformLocation(ordinaryShader.m_ShaderID, GL_VERTEX_SHADER, "theRedBlueSelection");
+	GLuint redIndex = glGetSubroutineIndex(ordinaryShader.m_ShaderID, GL_VERTEX_SHADER, "redColor");
+	GLuint blueIndex = glGetSubroutineIndex(ordinaryShader.m_ShaderID, GL_VERTEX_SHADER, "blueColor");
+
 	ordinaryShader.use();
 	glUniformMatrix4fv(uniform, 1, GL_FALSE, &projection[0][0]);
+
+	//
 
 	// Unbind everything
 	glUseProgram(0);
@@ -102,6 +109,10 @@ int main(void)
 		// Bind everything //
 		ordinaryShader.use();
 		// Put uniforms here, specially if they are varying every frame
+		
+		// have to bind subroutine again as when we unbind shader program ,as the active subroutine goes to default one
+		glUniformSubroutinesuiv(GL_VERTEX_SHADER, 1, &blueIndex);
+		
 		glBindVertexArray(vao);
 		//
 
