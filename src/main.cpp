@@ -5,23 +5,13 @@
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 
-
-static void error_callback(int error, const char* description)
-{
-	fprintf(stderr, "Error: %s\n", description);
-}
-
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
-{
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, GLFW_TRUE);
-}
+// settings
+const unsigned int SCR_WIDTH = 800;
+const unsigned int SCR_HEIGHT = 600;
 
 int main(void)
 {
 	GLFWwindow* window;
-
-	glfwSetErrorCallback(error_callback);
 
 	if (!glfwInit())
 		exit(EXIT_FAILURE);
@@ -30,35 +20,63 @@ int main(void)
 	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
-	window = glfwCreateWindow(640, 480, "OpenGL Viewer", NULL, NULL);
+	window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "OpenGL Viewer", NULL, NULL);
 	if (!window)
 	{
 		glfwTerminate();
 		exit(EXIT_FAILURE);
 	}
-
-	glfwSetKeyCallback(window, key_callback);
-
 	glfwMakeContextCurrent(window);
-	glfwSwapInterval(1);
 
 	if (glewInit() != GLEW_OK)
 		std::cout << "GLEW Initialization Failed!" << std::endl;
-
 	std::cout << glGetString(GL_VERSION) << std::endl;
 
+	// configure global opengl state
+	glEnable(GL_DEPTH_TEST);
 
-	float positions[] = {
-		-0.5F, -0.5F, //0
-		 0.5F, -0.5F, //1
-		 0.5F,  0.5F, //2
-		-0.5F,  0.5F, //3
-	};
+	float vertices[] = {
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f,  0.0f, -1.0f,
 
-	unsigned int indicies[] =
-	{
-		0, 1, 2,
-		2, 3, 0
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f,  0.0f,  1.0f,
+
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+		-0.5f,  0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f, -1.0f,  0.0f,  0.0f,
+		-0.5f, -0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+		-0.5f,  0.5f,  0.5f, -1.0f,  0.0f,  0.0f,
+
+		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+		 0.5f,  0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+		 0.5f, -0.5f, -0.5f,  1.0f,  0.0f,  0.0f,
+		 0.5f, -0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+		 0.5f,  0.5f,  0.5f,  1.0f,  0.0f,  0.0f,
+
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+		 0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+		 0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, -1.0f,  0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, -1.0f,  0.0f,
+
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+		 0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+		 0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f,  1.0f,  0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f,  1.0f,  0.0f
 	};
 
 	unsigned int vao;
@@ -68,46 +86,76 @@ int main(void)
 	unsigned int buffer;
 	glGenBuffers(1, &buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
-	glBufferData(GL_ARRAY_BUFFER, 4 * 2 * sizeof(float), positions, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(float) * 2, 0);
+	// position attribute
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)0);
 	glEnableVertexAttribArray(0);
+	// normal attribute
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 6 * sizeof(float), (void*)(3 * sizeof(float)));
+	glEnableVertexAttribArray(1);
 
-	unsigned int ibo;
-	glGenBuffers(1, &ibo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(float), indicies, GL_STATIC_DRAW);
-
-	// 4x3 aspect ration
-	glm::mat4 projection = glm::ortho(-4.0f, 4.0f, -3.0f, 3.0f, -1.0f, 1.0f);
-
-
-
-	Shader ordinaryShader("../res/vertex.glsl", "../res/fragment.glsl");
-	int uniform = glGetUniformLocation(ordinaryShader.m_ShaderID, "u_mvp");
-
-	ordinaryShader.use();
-	glUniformMatrix4fv(uniform, 1, GL_FALSE, &projection[0][0]);
+	Shader theShader("../res/vertex.glsl", "../res/fragment.glsl");
 
 	// Unbind everything
 	glUseProgram(0);
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	//glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+	// Extra variables
+	//----------------
+
+	float deltaTime = 0.0f;
+	float lastFrame = 0.0f;
+
+	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
+	glm::vec3 front(0.0f, 0.0f, -1.0f);
+	glm::vec3 up(0.0f, 1.0f, 0.0f);
+	glm::vec3 position(0.0f, 0.0f, 0.0f);
+
+	//----------------
 
 	while (!glfwWindowShouldClose(window))
 	{
-		glClear(GL_COLOR_BUFFER_BIT);
 
-		// Bind everything //
-		ordinaryShader.use();
-		// Put uniforms here, specially if they are varying every frame
+		float currentFrame = glfwGetTime();
+		deltaTime = currentFrame - lastFrame;
+		lastFrame = currentFrame;
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		// Activating shader and related uniforms
+		theShader.use();
+		theShader.setVec3("objectColor", 0.5f, 0.5f, 0.5f);
+		theShader.setVec3("lightColor", 1.0f, 1.0f, 1.0f);
+		theShader.setVec3("lightPos", lightPos);
+
+		// PROJECTION
+		glm::mat4 projection = glm::perspective(glm::radians(45.0F), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+		
+		// VIEW
+		glm::mat4 view = glm::lookAt(position, position + front, up);
+		view = glm::translate(view, glm::vec3(0.0f, 0.0f, -5.0f));
+		
+		theShader.setMat4("projection", projection);
+		theShader.setMat4("view", view);
+
+		// MODEL
+		GLfloat dChange = glm::degrees(lastFrame);
+		
+		glm::mat4 model = glm::mat4(1.0);
+		model = glm::rotate(model, glm::radians(45.0F), glm::vec3(1, 0, 0));
+		model = glm::rotate(model, glm::radians(dChange), glm::vec3(0, 1, 0));
+		model = glm::rotate(model, glm::radians(0.0F), glm::vec3(0, 0, 1));
+
+		theShader.setMat4("model", model);
+
+		//glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+		// render the cube
 		glBindVertexArray(vao);
-		//
-
-		// Sending signal to execute OpenGL pipeline with all binded objects //
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, nullptr);
-		//
+		glDrawArrays(GL_TRIANGLES, 0, 36);
 
 		glfwSwapBuffers(window);
 		glfwPollEvents();
