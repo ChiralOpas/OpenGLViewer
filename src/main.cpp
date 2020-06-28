@@ -9,6 +9,26 @@
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
+float X_POS;
+float Y_POS;
+
+static void exit_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
+{
+	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
+		glfwSetWindowShouldClose(window, GLFW_TRUE);
+}
+
+static void cursor_position_callback(GLFWwindow* window, double xpos, double ypos)
+{
+	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
+		return;
+
+	X_POS = xpos;
+	Y_POS = ypos;
+}
+
+
+
 int main(void)
 {
 	GLFWwindow* window;
@@ -31,6 +51,10 @@ int main(void)
 	if (glewInit() != GLEW_OK)
 		std::cout << "GLEW Initialization Failed!" << std::endl;
 	std::cout << glGetString(GL_VERSION) << std::endl;
+
+	// setting up callbacks
+	glfwSetKeyCallback(window, exit_callback);
+	glfwSetCursorPosCallback(window, cursor_position_callback);
 
 	// configure global opengl state
 	glEnable(GL_DEPTH_TEST);
@@ -106,9 +130,6 @@ int main(void)
 	// Extra variables
 	//----------------
 
-	float deltaTime = 0.0f;
-	float lastFrame = 0.0f;
-
 	glm::vec3 lightPos(1.2f, 1.0f, 2.0f);
 	glm::vec3 front(0.0f, 0.0f, -1.0f);
 	glm::vec3 up(0.0f, 1.0f, 0.0f);
@@ -117,12 +138,7 @@ int main(void)
 	//----------------
 
 	while (!glfwWindowShouldClose(window))
-	{
-
-		float currentFrame = glfwGetTime();
-		deltaTime = currentFrame - lastFrame;
-		lastFrame = currentFrame;
-
+	{	
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// Activating shader and related uniforms
@@ -142,11 +158,9 @@ int main(void)
 		theShader.setMat4("view", view);
 
 		// MODEL
-		GLfloat dChange = glm::degrees(lastFrame);
-		
 		glm::mat4 model = glm::mat4(1.0);
-		model = glm::rotate(model, glm::radians(45.0F), glm::vec3(1, 0, 0));
-		model = glm::rotate(model, glm::radians(dChange), glm::vec3(0, 1, 0));
+		model = glm::rotate(model, glm::radians(Y_POS), glm::vec3(1, 0, 0));
+		model = glm::rotate(model, glm::radians(X_POS), glm::vec3(0, 1, 0));
 		model = glm::rotate(model, glm::radians(0.0F), glm::vec3(0, 0, 1));
 
 		theShader.setMat4("model", model);
