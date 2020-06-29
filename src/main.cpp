@@ -9,8 +9,9 @@
 const unsigned int SCR_WIDTH = 800;
 const unsigned int SCR_HEIGHT = 600;
 
-float X_POS;
-float Y_POS;
+float X_LAST,Y_LAST;
+float YAW,PITCH;
+bool WAS_ML_BUTTON_DOWN;
 
 static void exit_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
@@ -23,10 +24,27 @@ static void cursor_position_callback(GLFWwindow* window, double xpos, double ypo
 	if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_RELEASE)
 		return;
 
-	X_POS = xpos;
-	Y_POS = ypos;
+	if (WAS_ML_BUTTON_DOWN)
+	{
+		X_LAST = xpos;
+		Y_LAST = ypos;
+		WAS_ML_BUTTON_DOWN = false;
+	}
+
+	float xOffset = xpos - X_LAST;
+	float yOffset = Y_LAST - ypos; // reversed since y-coordinates go from bottom to top
+	X_LAST = xpos;
+	Y_LAST = ypos;
+
+	YAW += xOffset;
+	PITCH += yOffset;
 }
 
+void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
+{
+	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
+		WAS_ML_BUTTON_DOWN = true;
+}
 
 
 int main(void)
@@ -55,6 +73,7 @@ int main(void)
 	// setting up callbacks
 	glfwSetKeyCallback(window, exit_callback);
 	glfwSetCursorPosCallback(window, cursor_position_callback);
+	glfwSetMouseButtonCallback(window, mouse_button_callback);
 
 	// configure global opengl state
 	glEnable(GL_DEPTH_TEST);
@@ -135,6 +154,9 @@ int main(void)
 	glm::vec3 up(0.0f, 1.0f, 0.0f);
 	glm::vec3 position(0.0f, 0.0f, 0.0f);
 
+	float xrAngle = 0.0F;
+	float xrDelta = 0.0F;
+
 	//----------------
 
 	while (!glfwWindowShouldClose(window))
@@ -159,8 +181,8 @@ int main(void)
 
 		// MODEL
 		glm::mat4 model = glm::mat4(1.0);
-		model = glm::rotate(model, glm::radians(Y_POS), glm::vec3(1, 0, 0));
-		model = glm::rotate(model, glm::radians(X_POS), glm::vec3(0, 1, 0));
+		model = glm::rotate(model, glm::radians(-PITCH), glm::vec3(1, 0, 0));
+		model = glm::rotate(model, glm::radians(YAW), glm::vec3(0, 1, 0));
 		model = glm::rotate(model, glm::radians(0.0F), glm::vec3(0, 0, 1));
 
 		theShader.setMat4("model", model);
