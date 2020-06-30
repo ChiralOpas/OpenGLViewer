@@ -26,15 +26,15 @@ static void cursor_position_callback(GLFWwindow* window, double xpos, double ypo
 
 	if (WAS_ML_BUTTON_DOWN)
 	{
-		X_LAST = xpos;
-		Y_LAST = ypos;
+		X_LAST = (float)xpos;
+		Y_LAST = (float)ypos;
 		WAS_ML_BUTTON_DOWN = false;
 	}
 
-	float xOffset = xpos - X_LAST;
-	float yOffset = Y_LAST - ypos; // reversed since y-coordinates go from bottom to top
-	X_LAST = xpos;
-	Y_LAST = ypos;
+	float xOffset = (float)xpos - X_LAST;
+	float yOffset = Y_LAST - (float)ypos; // reversed since y-coordinates go from bottom to top
+	X_LAST = (float)xpos;
+	Y_LAST = (float)ypos;
 
 	YAW += xOffset;
 	PITCH += yOffset;
