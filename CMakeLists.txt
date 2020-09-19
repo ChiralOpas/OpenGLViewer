@@ -3,6 +3,9 @@ set(PROJECT_NAME OpenGLViewer)
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 project (${PROJECT_NAME})
 
+# in case of two OpenGL versions detected
+set(OpenGL_GL_PREFERENCE GLVND)
+
 # adding sources to include in project
 file(GLOB SOURCES "src/*.cpp" "src/*.h")
 
@@ -36,7 +39,9 @@ set_target_properties(glm_shared PROPERTIES FOLDER GLM)
 set_target_properties(glm_static PROPERTIES FOLDER GLM)
 
 # adding library to link
-set(LIBRARIES_TO_LINK OpenGL32.lib)
+if (WIN32)
+    set(LIBRARIES_TO_LINK OpenGL32.lib)
+endif (WIN32)
 
 add_executable(${PROJECT_NAME} ${SOURCES} ${RESOURCES})
 
