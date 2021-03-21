@@ -6,6 +6,8 @@ project (${PROJECT_NAME})
 # in case of two OpenGL versions detected
 set(OpenGL_GL_PREFERENCE GLVND)
 
+set(CMAKE_CXX_STANDARD 14)
+
 # adding sources to include in project
 file(GLOB SOURCES "src/*.cpp" "src/*.h")
 
